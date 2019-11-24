@@ -15,13 +15,12 @@ variables:
 - ${{ if ne(parameters.Build.SourceBranch, 'master') }}:
   - group: Staging
 
-
 pool:
     vmImage: 'ubuntu-16.04'
 
 steps:
-  displayName: 'Install Node.js'
 - task: NodeTool@0
+  displayName: 'Install Node.js'
   inputs:
     versionSpec: '10.x'
 
