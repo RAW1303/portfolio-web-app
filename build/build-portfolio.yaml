@@ -10,9 +10,9 @@ pr:
 - develop
 
 variables:
-- ${{ if eq(Build.SourceBranch, 'master') }}:
+- ${{ if eq(variables.Build.SourceBranch, 'master') }}:
   - group: Prod
-- ${{ if ne(Build.SourceBranch, 'master') }}:
+- ${{ if ne(variables.Build.SourceBranch, 'master') }}:
   - group: Staging
 
 pool:
