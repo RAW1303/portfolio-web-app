@@ -6,56 +6,63 @@ trigger:
 - feature/*
 
 pr:
+- master
 - develop
+
+variables:
+${{ if eq(parameters.Build.SourceBranch, 'master') }}
+- group: Prod
+${{ if ne(parameters.Build.SourceBranch, 'master') }}
+- group: Staging
+
 
 pool:
     vmImage: 'ubuntu-16.04'
 
 steps:
+  displayName: 'Install Node.js'
 - task: NodeTool@0
   inputs:
     versionSpec: '10.x'
-  displayName: 'Install Node.js'
 
 - task: Npm@1
+  displayName: 'Install Angular CLI'
   inputs:
     command: 'custom'
     customCommand: 'install -g @angular/cli'
-  displayName: 'Install Angular CLI'
 
 - task: Npm@1
+  displayName: 'Resolve Dependencies'
   inputs:
-    command: 'custom'
-    customCommand: 'ci'
+    command: 'install'
     customRegistry: 'useFeed'
     customFeed: 'fad0022c-8dae-4f58-8008-b0bfd3e3128c'
-  displayName: 'Resolve Dependencies'
 
 - task: Npm@1
+  displayName: 'Test'
   inputs:
     command: 'custom'
     customCommand: 'test'
-  displayName: 'Test'
 
 - task: PublishTestResults@2
+  displayName: 'Publish Test Results'
   inputs:
     testResultsFormat: 'JUnit'
     testResultsFiles: 'test/results.xml' 
     testRunTitle: $(Build.BuildNumber)
-  displayName: 'Publish Test Results'
 
 - task: PublishCodeCoverageResults@1
+  displayName: 'Publish Coverage'
   inputs:
     codeCoverageTool: 'cobertura'
     summaryFileLocation: 'test/coverage.xml'
     failIfCoverageEmpty: true
-  displayName: 'Publish Coverage'
 
 - task: Npm@1
+  displayName: 'Build'
   inputs:
     command: 'custom'
     customCommand: 'run build-prod'
-  displayName: 'Build'
 
 - task: PublishBuildArtifacts@1
   inputs:
@@ -64,3 +71,12 @@ steps:
     parallel: true 
     parallelCount: 8
   displayName: 'Publish Artifacts'
+
+- task: AzureFileCopy@3
+  displayName: 'Deploy to Azure Storage'
+  inputs:
+    sourcePath: '$(System.DefaultWorkingDirectory)/dist'
+    destination: azureBlob
+    azureSubscription: '$(SubscriptionId)'
+    storageAccountRM: '$(StorageAccountName)'
+    containerName: '$web'
