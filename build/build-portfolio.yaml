@@ -67,7 +67,7 @@ jobs:
 
   - task: PublishBuildArtifacts@1
     inputs:
-      pathtoPublish: '$(System.DefaultWorkingDirectory)/dist' 
+      pathtoPublish: '$(System.DefaultWorkingDirectory)/dist/raw-portfolio' 
       artifactName: 'webApp' 
       parallel: true 
       parallelCount: 8
@@ -92,7 +92,7 @@ jobs:
   - task: AzureFileCopy@3
     displayName: 'Deploy to Azure Storage'
     inputs:
-      sourcePath: '$(System.DefaultWorkingDirectory)'
+      sourcePath: '$(System.DefaultWorkingDirectory)/webApp'
       destination: azureBlob
       azureSubscription: '$(SubscriptionId)'
       storageAccountRM: '$(StorageAccountName)'
