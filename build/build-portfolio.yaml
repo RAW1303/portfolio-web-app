@@ -15,67 +15,74 @@ variables:
 - ${{ if ne(variables.Build.SourceBranch, 'master') }}:
   - group: Staging
 
-pool:
+jobs:
+- job: Build
+  pool:
     vmImage: 'ubuntu-16.04'
 
-steps:
-- task: NodeTool@0
-  displayName: 'Install Node.js'
-  inputs:
-    versionSpec: '10.x'
+  steps:
+  - task: NodeTool@0
+    displayName: 'Install Node.js'
+    inputs:
+      versionSpec: '10.x'
 
-- task: Npm@1
-  displayName: 'Install Angular CLI'
-  inputs:
-    command: 'custom'
-    customCommand: 'install -g @angular/cli'
+  - task: Npm@1
+    displayName: 'Install Angular CLI'
+    inputs:
+      command: 'custom'
+      customCommand: 'install -g @angular/cli'
 
-- task: Npm@1
-  displayName: 'Resolve Dependencies'
-  inputs:
-    command: 'install'
-    customRegistry: 'useFeed'
-    customFeed: 'fad0022c-8dae-4f58-8008-b0bfd3e3128c'
+  - task: Npm@1
+    displayName: 'Resolve Dependencies'
+    inputs:
+      command: 'install'
+      customRegistry: 'useFeed'
+      customFeed: 'fad0022c-8dae-4f58-8008-b0bfd3e3128c'
 
-- task: Npm@1
-  displayName: 'Test'
-  inputs:
-    command: 'custom'
-    customCommand: 'test'
+  - task: Npm@1
+    displayName: 'Test'
+    inputs:
+      command: 'custom'
+      customCommand: 'test'
 
-- task: PublishTestResults@2
-  displayName: 'Publish Test Results'
-  inputs:
-    testResultsFormat: 'JUnit'
-    testResultsFiles: 'test/results.xml' 
-    testRunTitle: $(Build.BuildNumber)
+  - task: PublishTestResults@2
+    displayName: 'Publish Test Results'
+    inputs:
+      testResultsFormat: 'JUnit'
+      testResultsFiles: 'test/results.xml' 
+      testRunTitle: $(Build.BuildNumber)
 
-- task: PublishCodeCoverageResults@1
-  displayName: 'Publish Coverage'
-  inputs:
-    codeCoverageTool: 'cobertura'
-    summaryFileLocation: 'test/coverage.xml'
-    failIfCoverageEmpty: true
+  - task: PublishCodeCoverageResults@1
+    displayName: 'Publish Coverage'
+    inputs:
+      codeCoverageTool: 'cobertura'
+      summaryFileLocation: 'test/coverage.xml'
+      failIfCoverageEmpty: true
 
-- task: Npm@1
-  displayName: 'Build'
-  inputs:
-    command: 'custom'
-    customCommand: 'run build-prod'
+  - task: Npm@1
+    displayName: 'Build'
+    inputs:
+      command: 'custom'
+      customCommand: 'run build-prod'
 
-- task: PublishBuildArtifacts@1
-  inputs:
-    pathtoPublish: '$(System.DefaultWorkingDirectory)/dist' 
-    artifactName: 'app' 
-    parallel: true 
-    parallelCount: 8
-  displayName: 'Publish Artifacts'
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: '$(System.DefaultWorkingDirectory)/dist' 
+      artifactName: 'app' 
+      parallel: true 
+      parallelCount: 8
+    displayName: 'Publish Artifacts'
+  
+- job: Deploy
+  pool:
+    vmImage: 'windows-latest'
 
-- task: AzureFileCopy@3
-  displayName: 'Deploy to Azure Storage'
-  inputs:
-    sourcePath: '$(System.DefaultWorkingDirectory)/dist'
-    destination: azureBlob
-    azureSubscription: '$(SubscriptionId)'
-    storageAccountRM: '$(StorageAccountName)'
-    containerName: '$web'
+  steps:
+  - task: AzureFileCopy@3
+    displayName: 'Deploy to Azure Storage'
+    inputs:
+      sourcePath: '$(System.DefaultWorkingDirectory)/dist'
+      destination: azureBlob
+      azureSubscription: '$(SubscriptionId)'
+      storageAccountRM: '$(StorageAccountName)'
+      containerName: '$web'
