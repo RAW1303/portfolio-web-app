@@ -89,11 +89,10 @@ jobs:
       artifactName: 'webApp'
       downloadPath: $(System.DefaultWorkingDirectory)
 
-
   - task: AzureFileCopy@3
     displayName: 'Deploy to Azure Storage'
     inputs:
-      sourcePath: '$(System.DefaultWorkingDirectory)/dist'
+      sourcePath: '$(System.DefaultWorkingDirectory)'
       destination: azureBlob
       azureSubscription: '$(SubscriptionId)'
       storageAccountRM: '$(StorageAccountName)'
