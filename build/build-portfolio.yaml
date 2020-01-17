@@ -1,13 +1,18 @@
 name: $(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
 
 trigger:
-- master
-- develop
-- feature/*
+  batch: true
+  branches:
+    include:
+    - master
+    - develop
 
 pr:
-- master
-- develop
+  autoCancel: true
+  branches:
+    include:
+    - master
+    - develop
 
 variables:
 - ${{ if eq(variables.Build.SourceBranch, 'master') }}:
