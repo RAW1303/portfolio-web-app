@@ -17,8 +17,6 @@ pr:
 variables:
 - ${{ if eq(variables.Build.SourceBranch, 'master') }}:
   - group: Prod
-- ${{ if ne(variables.Build.SourceBranch, 'master') }}:
-  - group: Staging
 
 jobs:
 - job: Build
@@ -80,7 +78,7 @@ jobs:
   
 - job: Deploy
   dependsOn: Build
-  condition: succeeded()
+  condition: and(succeeded(), eq(variables.Build.SourceBranch, 'master'))
 
   pool:
     vmImage: 'windows-2019'
