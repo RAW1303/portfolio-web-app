@@ -110,7 +110,7 @@ jobs:
     displayName: 'Cleanup Web UI Blob Storage'
     inputs:
       targetType: 'filePath'
-      filePath: $(System.DefaultWorkingDirectory)/scripts/CleanUpBlobStorage.ps1
+      filePath: $(System.DefaultWorkingDirectory)/scripts/CleanBlobStorage.ps1
       arguments: -StorageAccountName '$(WebUiStorageAccountName)' -StorageAccountKey '$(WebUiStorageAccountKey)' -ContainerName '$web' 
 
   - task: AzureFileCopy@3
@@ -126,5 +126,5 @@ jobs:
     displayName: 'Set Cache-Control For Bundled Resources'
     inputs:
       targetType: 'filePath'
-      filePath: $(System.DefaultWorkingDirectory)/scripts/CleanDeployToBlobStorage.ps1
+      filePath: $(System.DefaultWorkingDirectory)/scripts/SetBlobCachePolicy.ps1
       arguments: -StorageAccountName '$(WebUiStorageAccountName)' -StorageAccountKey '$(WebUiStorageAccountKey)' -ContainerName '$web' 
