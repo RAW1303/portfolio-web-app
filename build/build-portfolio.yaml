@@ -70,6 +70,14 @@ jobs:
 
   - task: PublishBuildArtifacts@1
     inputs:
+      pathtoPublish: '$(System.DefaultWorkingDirectory)/build/scripts' 
+      artifactName: 'scripts' 
+      parallel: true 
+      parallelCount: 8
+    displayName: 'Publish Scripts'
+
+  - task: PublishBuildArtifacts@1
+    inputs:
       pathtoPublish: '$(System.DefaultWorkingDirectory)/dist/raw-portfolio' 
       artifactName: 'webApp' 
       parallel: true 
@@ -92,6 +100,19 @@ jobs:
       artifactName: 'webApp'
       downloadPath: $(System.DefaultWorkingDirectory)
 
+  - task: DownloadBuildArtifacts@0
+    displayName: 'Download Build Artifacts'
+    inputs:
+      artifactName: 'scripts'
+      downloadPath: $(System.DefaultWorkingDirectory)
+
+  - task: PowerShell@2
+    displayName: 'Cleanup Web UI Blob Storage'
+    inputs:
+      targetType: 'filePath'
+      filePath: $(System.DefaultWorkingDirectory)/scripts/CleanBlobStorage.ps1
+      arguments: -StorageAccountName '$(WebUiStorageAccountName)' -StorageAccountKey '$(WebUiStorageAccountKey)' -ContainerName '$web' 
+
   - task: AzureFileCopy@3
     displayName: 'Deploy to Azure Storage'
     inputs:
@@ -100,3 +121,10 @@ jobs:
       azureSubscription: '$(SubscriptionId)'
       storageAccountRM: '$(StorageAccountName)'
       containerName: '$web'
+
+  - task: PowerShell@2
+    displayName: 'Set Cache-Control For Bundled Resources'
+    inputs:
+      targetType: 'filePath'
+      filePath: $(System.DefaultWorkingDirectory)/scripts/SetBlobCachePolicy.ps1
+      arguments: -StorageAccountName '$(WebUiStorageAccountName)' -StorageAccountKey '$(WebUiStorageAccountKey)' -ContainerName '$web' 
