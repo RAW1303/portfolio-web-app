@@ -23,6 +23,7 @@ jobs:
   pool:
     vmImage: 'ubuntu-18.04'
 
+  steps:
   - script: 'yarn global add @angular/cli'
     displayName: 'Install Angular CLI'
 
