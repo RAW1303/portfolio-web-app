@@ -105,7 +105,10 @@ jobs:
     inputs:
       artifactName: 'scripts'
       downloadPath: $(System.DefaultWorkingDirectory)
-
+      
+  - powershell: 'Install-Module -Name Az -AllowClobber -Force'
+    displayName: 'Install Az Module'
+  
   - task: PowerShell@2
     displayName: 'Cleanup Web UI Blob Storage'
     inputs:
