@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { IconSvgService } from './core/services/icon-svg.service';
 
 @Component({
   selector: 'raw-root',
@@ -6,5 +7,6 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'raw-portfolio';
+  public title = 'raw-portfolio';
+  constructor(private iconSvgService: IconSvgService) {}
 }
